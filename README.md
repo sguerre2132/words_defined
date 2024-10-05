@@ -1,63 +1,95 @@
 from tkinter import messagebox
 import tkinter as tk
-from PIL import Image, ImageTk
 from PyDictionary import PyDictionary
-# GUI Application class
 
+# GUI Application class
+class DictionaryLookup:
+    def __init__(self):
+        self.dictionary = PyDictionary()
+
+    def get_word_meaning(self, word):
+        # Return the meaning of the word or None if no meaning found
+        return self.dictionary.meaning(word)
 
 class DictionaryApp:
-    def __init__(self,root):
-
-        self.root = tk.Tk()
+    def __init__(self, root):
+        self.root = root
         self.root.title("Words Defined")
         self.root.geometry("500x500")
 
+        self.dictionary_lookup = DictionaryLookup()  # Initialize the dictionary lookup
         self.gui_setup()
 
     def gui_setup(self):
-        #labels
-        self.my_title = tk.Label(self.root, text="Words Defined: An English Dictionary", font=("Times", 25 , "bold"), bg="skyblue")
+        # Title Label
+        self.my_title = tk.Label(self.root, text="Words Defined: An English Dictionary", font=("Times", 25, "bold"), bg="skyblue")
         self.my_title.pack()
 
-
-        # word input widget
+        # Word input widget
         self.word_entry = tk.Entry(self.root, width=50, borderwidth=5)
         self.word_entry.pack(pady=20)
 
-        # button to optimize search
-        self.search_button = tk.Button(self.root, text="Search Word",command=self.second_window, padx=20, pady=20, bg="white")
+        # Button to search for the word
+        self.search_button = tk.Button(self.root, text="Search Word", command=self.get_meaning_callback, padx=20, pady=20, bg="white")
         self.search_button.pack()
-        # button to clear word
-        self.clear_button = tk.Button(self.root, text="Clear", padx=20, pady=20, bg="white")
+
+        # Button to clear word
+        self.clear_button = tk.Button(self.root, text="Clear", command=self.clear_callback, padx=20, pady=20, bg="white")
         self.clear_button.pack()
-        # button to exit program
+
+        # Button to exit the program
         self.exit_button = tk.Button(self.root, text="Exit", padx=20, pady=20, bg="white", command=self.root.destroy)
         self.exit_button.pack()
 
+    def get_meaning_callback(self):
+        word = self.word_entry.get().strip()
 
+        # Input validation: non-empty and alphabetic
+        if not word:
+            messagebox.showwarning("Input Error", "Please enter a word.")
+            return
+        if not word.isalpha():
+            messagebox.showwarning("Input Error", "Only alphabetic characters are allowed.")
+            return
 
-    def second_window(self):
-        # second window for definition
-        self.window2 = tk.Toplevel()
-        self.def_window = tk.Label(self.window2, text="Definition:", font=("Times", 30, "bold"), bg="skyblue")
-        self.def_window.pack()
+        # Fetch the meaning
+        meaning = self.dictionary_lookup.get_word_meaning(word)  # Use dictionary_lookup instance
+        if meaning:
+            result = f"Meaning of '{word}':\n\n"
+            for pos, definitions in meaning.items():
+                result += f"{pos}:\n"
+                for definition in definitions:
+                    result += f"- {definition}\n"
+            self.display_definition(result)
+        else:
+            messagebox.showerror("Error", f"No definition found for '{word}'.")
 
-        # result label
-        self.result_label = tk.Label(self.window2, text="", wraplength=500, justify="left", anchor="w",font=("Arial", 12))
-        self.result_label.pack(pady=20)
+    def display_definition(self, definition):
+        # Open a new window to display the definition
+        self.window2 = tk.Toplevel(self.root)
+        self.window2.title("Definition")
+        self.window2.geometry("400x300")
 
+        def_label = tk.Label(self.window2, text="Definition:", font=("Times", 20, "bold"), bg="skyblue")
+        def_label.pack(pady=10)
 
-    def search_word(self):
+        # Create a text widget to display the definition
+        result_text = tk.Text(self.window2, wrap="word", height=10, width=50)
+        result_text.pack(pady=20)
+        result_text.insert(tk.END, definition)  # Insert the definition text
+        result_text.config(state=tk.DISABLED)  # Make the text widget read-only
 
+    def clear_callback(self):
+        # Clear entry field and result label
+        self.word_entry.delete(0, tk.END)
 
-      #uses PyDictionary to find define word
-      self.dictionary = PyDictionary()
-      self.word_definition = self.dictionary.meaning(self.word_entry.get())
-
-
+    def exit_callback(self):
+        # Exit the application
+        self.root.quit()
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = DictionaryApp(root)
+    dictionary = DictionaryApp(root)
     root.mainloop()
+
 
