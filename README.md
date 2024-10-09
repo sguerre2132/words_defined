@@ -1,6 +1,8 @@
 from tkinter import messagebox
 import tkinter as tk
 from PyDictionary import PyDictionary
+from PIL import ImageTk,Image
+
 
 # GUI Application class
 class DictionaryLookup:
@@ -11,6 +13,7 @@ class DictionaryLookup:
         # Return the meaning of the word or None if no meaning found
         return self.dictionary.meaning(word)
 
+
 class DictionaryApp:
     def __init__(self, root):
         self.root = root
@@ -20,10 +23,22 @@ class DictionaryApp:
         self.dictionary_lookup = DictionaryLookup()  # Initialize the dictionary lookup
         self.gui_setup()
 
+
     def gui_setup(self):
+
+        # Load the image and add it to the top of the window
+        self.logo_image = Image.open("mainimage.jpg")  # Replace with your image file path
+        self.logo_image = self.logo_image.resize((100, 100))  # Resize as needed
+        self.logo_photo = ImageTk.PhotoImage(self.logo_image)
+
+        self.logo_label = tk.Label(self.root, image=self.logo_photo)
+        self.logo_label.pack(pady=10)  # Adjust padding as needed
+
+
         # Title Label
         self.my_title = tk.Label(self.root, text="Words Defined: An English Dictionary", font=("Times", 25, "bold"), bg="skyblue")
         self.my_title.pack()
+
 
         # Word input widget
         self.word_entry = tk.Entry(self.root, width=50, borderwidth=5)
@@ -40,6 +55,7 @@ class DictionaryApp:
         # Button to exit the program
         self.exit_button = tk.Button(self.root, text="Exit", padx=20, pady=20, bg="white", command=self.root.destroy)
         self.exit_button.pack()
+
 
     def get_meaning_callback(self):
         word = self.word_entry.get().strip()
@@ -70,6 +86,16 @@ class DictionaryApp:
         self.window2.title("Definition")
         self.window2.geometry("400x300")
 
+        # Load the image and add it to the window
+        self.definition_image = Image.open("Define.jpg")  # Replace with your image file path
+        self.definition_image = self.definition_image.resize((100,100))  # Resize as needed
+        self.definition_photo = ImageTk.PhotoImage(self.definition_image)
+
+        self.image_label = tk.Label(self.window2, image=self.definition_photo)
+        self.image_label.pack(pady=10)  # Adjust padding as needed
+
+
+
         def_label = tk.Label(self.window2, text="Definition:", font=("Times", 20, "bold"), bg="skyblue")
         def_label.pack(pady=10)
 
@@ -87,6 +113,9 @@ class DictionaryApp:
         # Exit the application
         self.root.quit()
 
+
+
+#runs the main program
 if __name__ == "__main__":
     root = tk.Tk()
     dictionary = DictionaryApp(root)
